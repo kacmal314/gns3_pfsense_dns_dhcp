@@ -1,1 +1,3 @@
-witamy w schowku
+include "/etc/bind/ddns.key";
+zone "lab.local" { type master; file "/var/lib/bind/db.lab.local"; allow-
+update { key ddns-key; }; };
