@@ -1,3 +1,5 @@
-include "/etc/bind/ddns.key";
-zone "lab.local" { type master; file "/var/lib/bind/db.lab.local"; allow-
-update { key ddns-key; }; };
+$TTL 86400
+@ IN SOA ns.lab.local. root.lab.local. ( 2 3600 1800 604800 86400 )
+@ IN NS ns.lab.local.
+@ IN A 10.20.0.3
+ns IN A 10.20.0.3
