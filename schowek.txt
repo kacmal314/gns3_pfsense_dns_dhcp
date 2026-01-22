@@ -1,15 +1,14 @@
-Zadanie D – Serwer DHCP
-Konsola: serwerdhcp. Start: loguj.
-1. Edytuj /etc/default/isc-dhcp-server: INTERFACESv4="eth0".
-2. Edytuj /etc/dhcp/dhcpd.conf:
-default-lease-time 600; max-lease-time 7200; authoritative; log-facility
-local7;
-ddns-update-style standard; update-static-leases on;
-key "ddns-key" { algorithm hmac-sha256; secret "TWOJ_SEKRET=="; };
-zone lab.local. { primary 10.20.0.3; key ddns-key; }
-subnet 10.20.0.0 netmask 255.255.255.0 {}
-subnet 192.168.1.0 netmask 255.255.255.0 {
-range 192.168.1.100 192.168.1.200; option routers 192.168.1.1;
-option domain-name-servers 10.20.0.3; option domain-name "lab.local";
-}
-3. /etc/init.d/isc-dhcp-server start
+1. Klucz: tsig-keygen -a HMAC-SHA256 ddns-key > /etc/bind/ddns.key
+(skopiuj sekret).
+2. BIND: Edytuj /etc/bind/named.conf.local:
+include "/etc/bind/ddns.key";
+zone "lab.local" { type master; file "/var/lib/bind/db.lab.local"; allow-
+update { key ddns-key; }; };
+3. Strefa: Utwórz /var/lib/bind/db.lab.local:
+$TTL 86400
+@ IN SOA ns.lab.local. root.lab.local. ( 2 3600 1800 604800 86400 )
+@ IN NS ns.lab.local.
+@ IN A 10.20.0.3
+ns IN A 10.20.0.3
+chown bind:bind /var/lib/bind/db.lab.local
+/etc/init.d/named start
